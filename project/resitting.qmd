@@ -1,0 +1,103 @@
+---
+title: "Ireland's Response to COVID-19: an International Comparative Analysis"
+author: "Thomas"
+format: html
+editor: visual
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+A key way governments responded to Covid was to increase testing as much as possible to provide more accurate data and effectively respond to the needs of their citizens. Denmark's level of testing was significantly higher than their peers, with Ireland's level of testing the second highest.
+```{r}
+library(tidyverse)
+library(lubridate)
+library(maps)
+library(sf)
+options(scipen = 999)
+
+covid <- read_csv("country_data.csv")
+
+covid <- covid %>%
+  mutate(date = as.Date(date, format = "%Y-%m-%d"))
+
+
+testing_rate <- covid %>%
+  group_by(location) %>%
+  filter(!location == "Lower middle income") %>%
+  summarise(Tests_per_thousand = new_tests_per_thousand)
+
+
+ggplot(data = testing_rate) +
+  aes(x = location, y = Tests_per_thousand, fill = location) +
+  geom_col() +
+  labs(
+    x = "Tests per Thousand",
+    y = "Country",
+    title = "Rates of Testing")
+  
+
+
+```
+
+There was much skepticism surrounding the lethality of COVID-19, with many disregarding the real risks of the infection. There is a clear positive relationship between COVID case and deaths.
+
+```{r}
+covid <- read_csv("country_data.csv")
+
+
+
+
+ggplot(data = covid) +
+  aes(x = total_cases, y = total_deaths, color = location) + geom_point() +
+  theme_classic() +
+  geom_smooth(method = "lm") +
+  labs(
+    x = "Total Cases",
+    y = "Total Deaths",
+    title = "Relationship between COVID and Death")
+  
+```
+The map below shows the total positive cases for each location. Lower Middle Income is excluded as it is not a physical location.
+```{r}
+
+covid <- read_csv("country_data.csv")
+
+#can't get map to work
+
+cases_covid <- covid %>%
+  filter(date == 31/12/2022)
+
+map_world <- map_data("world")
+
+map_case_2021 <- full_join(map_world, cases_covid, by = c("region" = "location"))
+
+ggplot(data = map_case_2021) +
+  aes(x = long, y = lat, group = group, fill = total_cases) + 
+  geom_polygon()
+
+
+```
+This line graph shows the uptake of vaccinations over time in three selected countries: Ireland; Denmark; and Russia.
+```{r}
+
+positive_irl <- covid %>%
+    filter(location %in% c("Ireland", "Denmark", "Russia"))
+
+  
+
+ggplot(data = positive_irl) +
+  aes(x = date, y = people_fully_vaccinated_per_hundred, color = location) + 
+  geom_point() +
+labs(
+    x = "Date",
+    y = "Total People Vaccinated",
+    title = "Vaccination Uptake")
+
+
+```
+
+```
+
+

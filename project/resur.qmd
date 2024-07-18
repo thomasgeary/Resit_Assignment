@@ -1,0 +1,68 @@
+---
+title: "Resit"
+author: "Thomas"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(maps)
+options(scipen = 999)
+covid <- read_csv("country_data.csv")
+
+
+mutate(covid, avg_cases = mean(total_tests_per_thousand))
+
+testing_rate <- covid %>%
+  group_by(location) %>%
+  summarise(Tests_per_thousand = new_tests_per_thousand)
+
+ggplot(data = testing_rate) +
+  aes(x = location, y = Tests_per_thousand, fill = location) +
+  geom_col()
+
+  
+
+
+
+```
+
+You can add options to executable code like this
+
+```{r}
+covid <- read_csv("country_data.csv")
+
+ggplot(data = covid) +
+  aes(x = new_cases_per_million, y = new_deaths_per_million, color = location) + 
+  geom_point()
+```
+
+```{r}
+covid <- read_csv("country_data.csv")
+
+covid %>%
+  mutate(date=dmy(31/12/2022))
+
+ggplot(data = covid, aes(x = date, y = mean(people_fully_vaccinated_per_hundred), group = location)) +
+  geom_line() +
+  geom_point()
+```
+
+```{r}
+
+
+covid_cases <- covid %>%
+  filter(date == 31/12/2022)
+
+map_world <- map_data("world")
+
+covid_cases <- full_join(map_world, covid_cases, by =c("region" = "location"))
+
+ggplot(data = covid_cases) +
+  aes(x = long, y = lat, group = group, fill = total_cases)
+
+
+
+```
